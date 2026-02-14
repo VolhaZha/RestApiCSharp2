@@ -23,10 +23,10 @@ jobs:
           dotnet-version: '9.0'
           
       - name: Restore NuGet packages
-        run: dotnet restore
+        run: dotnet restore RestApiCSharp2.sln
 
       - name: Build the project
-        run: dotnet build --configuration Release
+        run: dotnet build RestApiCSharp2.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test --configuration Release 
+        run: dotnet test RestApiCSharp2.sln --configuration Release 
