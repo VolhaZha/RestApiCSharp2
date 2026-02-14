@@ -31,7 +31,6 @@ jobs:
       - name: Build the project
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
-      # Run tests and generate Allure-compatible results
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release --logger "allure;allure-results"  # Generates allure-results
 
