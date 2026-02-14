@@ -32,4 +32,4 @@ jobs:
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release --logger "allure;allure-results"  # Generates allure-results
+        run: dotnet test RestApiCSharp2.sln --configuration Release 
