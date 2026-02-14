@@ -33,20 +33,3 @@ jobs:
 
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release --logger "allure;allure-results"  # Generates allure-results
-
-      # Install Allure Commandline tool
-      - name: Install Allure Commandline
-        run: |
-          wget -qO- https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz | tar xvz
-          sudo mv allure-2.14.0/bin/allure /usr/local/bin/allure
-
-      # Generate Allure report from the results
-      - name: Generate Allure report
-        run: allure generate allure-results --clean -o allure-report
-
-      # Publish Allure results on GitHub
-      - name: Run Allure Action
-      uses: allure-framework/allure-action@v1  # Use version v1 instead of v2
-      with:
-      report-directory: "./allure-report"
-      github-token: ${{ secrets.GITHUB_TOKEN }}
