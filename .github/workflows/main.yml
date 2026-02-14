@@ -43,7 +43,7 @@ jobs:
         run: allure generate test_results.trx --clean -o allure-report
 
       - name: Publish Allure results
-        uses: allure-framework/allure-action@v2
+        uses: allure-framework/allure-action@v1
         with:
           allure_results: allure-report
           allure_report: allure-report
