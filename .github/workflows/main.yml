@@ -17,6 +17,9 @@ jobs:
       - name: Run Docker container
         run: docker run -d -p 5050:8082 coherentsolutions/rest-training:2.0
 
+      - name: Wait for the container to be ready
+        run: sleep 30
+
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v3
         with:
