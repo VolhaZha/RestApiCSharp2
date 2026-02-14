@@ -31,15 +31,23 @@ jobs:
       - name: Build the project
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
+      # Run tests and generate Allure-compatible results
       - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release 
+        run: dotnet test RestApiCSharp2.sln --configuration Release --logger "allure;allure-results"  # Generates allure-results
 
-      - name: Run tests and generate report
-        run: npx allure run -- npm run test
-        # This generates allure-results/ directory and creates allure-report/ with summary.json
+      # Install Allure Commandline tool
+      - name: Install Allure Commandline
+        run: |
+          wget -qO- https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz | tar xvz
+          sudo mv allure-2.14.0/bin/allure /usr/local/bin/allure
 
+      # Generate Allure report from the results
+      - name: Generate Allure report
+        run: allure generate allure-results --clean -o allure-report
+
+      # Publish Allure results on GitHub
       - name: Run Allure Action
-        uses: allure-framework/allure-action@v0
+        uses: allure-framework/allure-action@v2  # Use the correct version
         with:
           report-directory: "./allure-report"
           github-token: ${{ secrets.GITHUB_TOKEN }}
