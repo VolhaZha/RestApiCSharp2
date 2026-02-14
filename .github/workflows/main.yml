@@ -47,7 +47,7 @@ jobs:
 
       # Publish Allure results on GitHub
       - name: Run Allure Action
-        uses: allure-framework/allure-action@v2  # Use the correct version
-        with:
-          report-directory: "./allure-report"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      uses: allure-framework/allure-action@v1  # Use version v1 instead of v2
+      with:
+      report-directory: "./allure-report"
+      github-token: ${{ secrets.GITHUB_TOKEN }}
