@@ -33,3 +33,9 @@ jobs:
 
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release 
+
+      - name: Run Allure Action
+        uses: allure-framework/allure-report@v0
+        with:
+            report-directory: "./allure-report"
+            github-token: ${{ secrets.GITHUB_TOKEN }}
