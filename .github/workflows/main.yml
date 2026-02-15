@@ -31,8 +31,8 @@ jobs:
       - name: Build the project
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
-      - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release 
+      - name: Run tests and generate report
+        run: npx allure run -- npm run test RestApiCSharp2.sln
 
       - name: Run Allure Action
         uses: allure-framework/allure-report@v0
