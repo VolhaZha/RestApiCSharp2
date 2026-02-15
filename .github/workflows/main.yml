@@ -34,28 +34,20 @@ jobs:
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release 
 
-      # -----------------------------
-      # Install Allure CLI
-      # -----------------------------
-      - name: Install Allure
-        run: |
-          sudo apt-add-repository ppa:qameta/allure
-          sudo apt-get update
-          sudo apt-get install allure
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
 
-      # -----------------------------
-      # Generate Allure Report
-      # -----------------------------
-      - name: Generate Allure Report
-        run: allure generate ./allure-results --clean -o ./allure-report
+      # 4. Run tests (must use Allure reporter)
+      - name: Run tests and generate report
+        run: npx allure run -- npm run test
+        # This generates allure-results/ directory and creates allure-report/ with summary.json
 
-      # -----------------------------
-      # Deploy report to GitHub Pages
-      # -----------------------------
-      - name: Deploy report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      # 5. Post summary to PR
+      - name: Run Allure Action
+        uses: allure-framework/allure-action@v0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
+          report-directory: "./allure-report"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
