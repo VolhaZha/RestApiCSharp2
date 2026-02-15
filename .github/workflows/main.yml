@@ -35,12 +35,22 @@ jobs:
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  # Allow workflow to continue even if tests fail
           
-      # 4. Run tests (must use Allure reporter)
-      - name: Run tests and generate report
-        run: npx allure run -- npm run test
-        # This generates allure-results/ directory and creates allure-report/ with summary.json
+# Step 7: Install Allure Commandline (if not already installed in your Docker container)
+      - name: Install Allure Commandline
+        run: |
+          wget -qO - https://dl.bintray.com/qameta/generic/allure-2.13.8.tgz | tar -xz
+          sudo ln -s $(pwd)/allure-2.13.8/bin/allure /usr/local/bin/allure
 
-      # 5. Post summary to PR
+      # Step 8: Generate Allure report from NUnit test results
+      - name: Generate Allure report
+        run: |
+          allure generate results.trx --clean -o allure-report
+
+      # Step 9: List the generated Allure report results (for debugging purposes)
+      - name: List Allure Results
+        run: ls -la allure-report/
+
+      # Step 10: Post Allure report to GitHub (or any other platform as required)
       - name: Run Allure Action
         uses: allure-framework/allure-action@v0
         with:
