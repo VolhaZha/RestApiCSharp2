@@ -34,8 +34,11 @@ jobs:
       - name: Run tests and generate report
         run: npx allure run -- npm run test RestApiCSharp2.sln
 
-      - name: Run Allure Action
-        uses: allure-framework/allure-report@v0
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@v1
+        if: always()
         with:
-            report-directory: "./allure-report"
-            github-token: ${{ secrets.GITHUB_TOKEN }}
+          allure_results: ./allure-results
+          allure_report: ./allure-report
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
