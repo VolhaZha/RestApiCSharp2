@@ -34,17 +34,6 @@ jobs:
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  # Allow workflow to continue even if tests fail
-
-      # Install dependencies: Either `npm install` or `npm ci` based on whether package-lock.json is present
-      - name: Install dependencies
-        run: |
-          if [ -f "package-lock.json" ]; then
-            echo "Using npm ci";
-            npm ci;
-          else
-            echo "No package-lock.json found, running npm install instead";
-            npm install;
-          fi
           
       # 4. Run tests (must use Allure reporter)
       - name: Run tests and generate report
