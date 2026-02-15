@@ -31,8 +31,8 @@ jobs:
       - name: Build the project
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
-      - name: Run tests and generate report
-        run: npx allure run -- npm run test RestApiCSharp2.sln
+      - name: Run tests
+        run: dotnet test RestApiCSharp2.sln --configuration Release 
 
       - name: Generate Allure Report
         uses: simple-elf/allure-report-action@v1
@@ -42,3 +42,10 @@ jobs:
           allure_report: ./allure-report
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./allure-report
