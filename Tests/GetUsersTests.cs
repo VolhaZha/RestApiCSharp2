@@ -1,7 +1,6 @@
 ﻿using Allure.NUnit;
 using Allure.NUnit.Attributes;
 using RestApiCSharp.ConstantsTestingGeneral;
-using RestSharp;
 using System.Net;
 
 namespace RestApiCSharp.Tests
@@ -11,7 +10,7 @@ namespace RestApiCSharp.Tests
     {
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var users = new List<User>
             {
@@ -21,145 +20,158 @@ namespace RestApiCSharp.Tests
                 new User { Age = 50, Name = "uGetUsersTests4", Sex = "MALE" }
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, users);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, users);
+
         }
 
         [Test]
         [AllureStep("Get users without filters and verify 200 OK response")]
-        public void GetUsers_Return200_Test()
+        public async Task GetUsers_Return200_Test()
         {
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                 $"Status code 200 not returned." +
                 $"Expected status code 200 (OK), but got {response.StatusCode}. " +
-                $"Response content: {response.Content}");
+                $"Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users without filters and verify all users are returned")]
-        public void GetUsers_UserReceived_Test()
+        public async Task GetUsers_UserReceived_Test()
         {
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+
+
+            var user123 = new User
+            {
+                Age = 0,
+                Name = "trololo",
+                Sex = "FEMALE",
+                ZipCode = "oz"
+            };
+
+            await ApiClientInstance.CreateUsers(ConstantsTesting.WriteScope, user123);
+
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
             var expectedUsers = new[] { "uGetUsersTests1", "uGetUsersTests2", "uGetUsersTests3", "uGetUsersTests4" };
 
             foreach (var user in expectedUsers)
             {
-                Assert.That(response.Content, Does.Contain(user),
-                    $"The user '{user}' was not received. Response content: {response.Content}");
+                Assert.That(await response.Content.ReadAsStringAsync(), Does.Contain(user),
+                    $"The user '{user}' was not received. Response content: {await response.Content.ReadAsStringAsync()}");
             }
         }
 
         [Test]
         [AllureStep("Get users older than specified age and verify 200 OK response")]
-        public void GetUsersOlderThan_Return200_Test()
+        public async Task GetUsersOlderThan_Return200_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("olderThan", "6"),
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                 $"Status code 200 not returned." +
                 $"Expected status code 200 (OK), but got {response.StatusCode}. " +
-                $"Response content: {response.Content}");
+                $"Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users older than specified age and verify correct users are returned")]
-        public void GetUsersOlderThan_UserAdded_Test()
+        public async Task GetUsersOlderThan_UserAdded_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("olderThan", "6"),
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             var expectedUsers = new[] { "uGetUsersTests2", "uGetUsersTests3", "uGetUsersTests4" };
 
             foreach (var user in expectedUsers)
             {
-                Assert.That(response.Content, Does.Contain(user),
-                    $"The user '{user}' was not received. Response content: {response.Content}");
+                Assert.That(await response.Content.ReadAsStringAsync(), Does.Contain(user),
+                    $"The user '{user}' was not received. Response content: {await response.Content.ReadAsStringAsync()}");
             }
-            Assert.That(response.Content, Does.Not.Contain("uGetUsersTests1"),
-            $"The user '{"uGetUsersTests1"}' was received, though should not be. Response content: {response.Content}");
+            Assert.That(await response.Content.ReadAsStringAsync(), Does.Not.Contain("uGetUsersTests1"),
+            $"The user '{"uGetUsersTests1"}' was received, though should not be. Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users younger than specified age and verify 200 OK response")]
-        public void GetUsersYoungerThan_Return200_Test()
+        public async Task GetUsersYoungerThan_Return200_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("youngerThan", "6")
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                 $"Status code 200 not returned." +
                 $"Expected status code 200 (OK), but got {response.StatusCode}. " +
-                $"Response content: {response.Content}");
+                $"Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users younger than specified age and verify correct users are returned")]
-        public void GetUsersYoungerThan_UserAdded_Test()
+        public async Task GetUsersYoungerThan_UserAdded_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("youngerThan", "6")
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             var expectedUsers = new[] { "uGetUsersTests1" };
 
             foreach (var user in expectedUsers)
             {
-                Assert.That(response.Content, Does.Contain(user),
-                    $"The user '{user}' was not received. Response content: {response.Content}");
+                Assert.That(await response.Content.ReadAsStringAsync(), Does.Contain(user),
+                    $"The user '{user}' was not received. Response content: {await response.Content.ReadAsStringAsync()}");
             }
-            Assert.That(response.Content, Does.Not.Contain("uGetUsersTests2"),
-            $"The user '{"uGetUsersTests2"}' was received, though should not be. Response content: {response.Content}");
+            Assert.That(await response.Content.ReadAsStringAsync(), Does.Not.Contain("uGetUsersTests2"),
+            $"The user '{"uGetUsersTests2"}' was received, though should not be. Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users filtered by sex and verify 200 OK response")]
-        public void GetUsersSex_Return200_Test()
+        public async Task GetUsersSex_Return200_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("sex", "MALE")
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                 $"Status code 200 not returned." +
                 $"Expected status code 200 (OK), but got {response.StatusCode}. " +
-                $"Response content: {response.Content}");
+                $"Response content: {await response.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Get users filtered by sex and verify only male users are returned")]
-        public void GetUsersSex_UserAdded_Test()
+        public async Task GetUsersSex_UserAdded_Test()
         {
             var parameters = new List<(string name, string value)>
             {
                 ("sex", "MALE")
             };
-            RestResponse response = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
+            var response = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope, parameters);
 
             var expectedUsers = new[] { "uGetUsersTests3", "uGetUsersTests4" };
 
             foreach (var user in expectedUsers)
             {
-                Assert.That(response.Content, Does.Contain(user),
-                    $"The user '{user}' was not received. Response content: {response.Content}");
+                Assert.That(await response.Content.ReadAsStringAsync(), Does.Contain(user),
+                    $"The user '{user}' was not received. Response content: {await response.Content.ReadAsStringAsync()}");
             }
-            Assert.That(response.Content, Does.Not.Contain("uGetUsersTests1"),
-            $"The user '{"uGetUsersTests1"}' was received, though should not be. Response content: {response.Content}");
+            Assert.That(await response.Content.ReadAsStringAsync(), Does.Not.Contain("uGetUsersTests1"),
+            $"The user '{"uGetUsersTests1"}' was received, though should not be. Response content: {await response.Content.ReadAsStringAsync()}");
         }
     }
 }
