@@ -10,24 +10,24 @@ namespace RestApiCSharp.Tests
     public class UpdateUsersTests : BaseApiTest
     {
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var zipCodes = new List<string> 
             { "oz", "oz1", "oz2", "oz3", "oz4", "oz5", "oz6", "oz7", "oz02", "oz12", "oz22", "oz32", "oz42" };
 
-            ApiClientInstance.ExpandZipCodes(ConstantsTesting.WriteScope, zipCodes);
+            await ApiClientInstance.ExpandZipCodes(ConstantsTesting.WriteScope, zipCodes);
         }
 
         [Test]
         [AllureStep("Update user via PATCH and verify user is updated successfully")]
-        public void UpdateUserPatch_Return200_UserUpdated_Test()
+        public async Task UpdateUserPatch_Return200_UserUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u", Sex = "FEMALE", ZipCode = "oz"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -35,27 +35,27 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
             Assert.That(updateUserResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                             $"Status code 200 not returned." +
                             $"Expected status code 200 (OK), but got {updateUserResponse.StatusCode}. " +
-                            $"Response content: {updateUserResponse.Content}");
+                            $"Response content: {await updateUserResponse.Content.ReadAsStringAsync()}");
             Assert.That(getUsersResponse.Content, Does.Contain("New"),
-                            $"The user 'New' was not added. Response content: {getUsersResponse.Content}");
+                            $"The user 'New' was not added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Update user via PUT and verify user is updated successfully")]
-        public void UpdateUserPut_Return200_UserUpdated_Test()
+        public async Task UpdateUserPut_Return200_UserUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u1", Sex = "FEMALE", ZipCode = "oz1"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -63,27 +63,27 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
             Assert.That(updateUserResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK),
                             $"Status code 200 not returned." +
                             $"Expected status code 200 (OK), but got {updateUserResponse.StatusCode}. " +
-                            $"Response content: {updateUserResponse.Content}");
-            Assert.That(getUsersResponse.Content, Does.Contain("New"),
-                            $"The user 'New' was not added. Response content: {getUsersResponse.Content}");
+                            $"Response content: {await updateUserResponse.Content.ReadAsStringAsync()}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Contain("New"),
+                            $"The user 'New' was not added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Update user via PATCH with incorrect zip code and verify update is rejected")]
-        public void UpdateUserIncorrectZipCodePatch_Return424_UserNotUpdated_Test()
+        public async Task UpdateUserIncorrectZipCodePatch_Return424_UserNotUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u2", Sex = "FEMALE", ZipCode = "oz2"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -91,25 +91,25 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
-            Assert.That(updateUserResponse.Content, Does.Contain("FailedDependency"),
-                 $"Response content does not indicate FailedDependency. Content: {updateUserResponse.Content}");
-            Assert.That(getUsersResponse.Content, Does.Not.Contain("New2"),
-                $"The user 'New2' was added. Response content: {getUsersResponse.Content}");
+            Assert.That(await updateUserResponse.Content.ReadAsStringAsync(), Does.Contain("FailedDependency"),
+                 $"Response content does not indicate FailedDependency. Content: {await updateUserResponse.Content.ReadAsStringAsync()}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Not.Contain("New2"),
+                $"The user 'New2' was added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Update user via PUT with incorrect zip code and verify update is rejected")]
-        public void UpdateUserIncorrectZipCodePut_Return424_UserNotUpdated_Test()
+        public async Task UpdateUserIncorrectZipCodePut_Return424_UserNotUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u3", Sex = "FEMALE", ZipCode = "oz3"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -117,25 +117,25 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
-            Assert.That(updateUserResponse.Content, Does.Contain("FailedDependency"),
-                 $"Response content does not indicate FailedDependency. Content: {updateUserResponse.Content}");
-            Assert.That(getUsersResponse.Content, Does.Not.Contain("New3"),
-                $"The user 'New3' was added. Response content: {getUsersResponse.Content}");
+            Assert.That(await updateUserResponse.Content.ReadAsStringAsync(), Does.Contain("FailedDependency"),
+                 $"Response content does not indicate FailedDependency. Content: {await updateUserResponse.Content.ReadAsStringAsync()}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Not.Contain("New3"),
+                $"The user 'New3' was added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureStep("Update user via PATCH with missing required fields and verify conflict response")]
-        public void UpdateUserNotAllReqFieldsPatch_Return409_Test()
+        public async Task UpdateUserNotAllReqFieldsPatch_Return409_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u4", Sex = "FEMALE", ZipCode = "oz4"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -143,23 +143,23 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
 
-            Assert.That(updateUserResponse.Content, Does.Contain("Conflict"),
-                 $"Response content does not indicate Conflict. Content: {updateUserResponse.Content}");
+            Assert.That(await updateUserResponse.Content.ReadAsStringAsync(), Does.Contain("Conflict"),
+                 $"Response content does not indicate Conflict. Content: {await updateUserResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureIssue("BUG_UpdateUser_1")]
         [AllureStep("Update user via PATCH with missing required fields and verify user is not updated")]
-        public void UpdateUserNotAllReqFieldsPatch_UserNotUpdated_Test()
+        public async Task UpdateUserNotAllReqFieldsPatch_UserNotUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u5", Sex = "FEMALE", ZipCode = "oz5"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -167,25 +167,25 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPatch(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
-            Assert.That(getUsersResponse.Content, Does.Not.Contain("New4"),
-                $"The user 'New4' was added. Response content: {getUsersResponse.Content}");
-            Assert.That(getUsersResponse.Content, Does.Contain("u5"),
-                $"The user 'u5' was removed. Response content: {getUsersResponse.Content}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Not.Contain("New4"),
+                $"The user 'New4' was added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
+            Assert.That(    getUsersResponse.Content, Does.Contain("u5"),
+                $"The user 'u5' was removed. Response content: {    getUsersResponse.Content}");
         }
 
         [Test]
         [AllureStep("Update user via PUT with missing required fields and verify conflict response")]
-        public void UpdateUserNotAllReqFieldsPut_Return409_Test()
+        public async Task UpdateUserNotAllReqFieldsPut_Return409_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u6", Sex = "FEMALE", ZipCode = "oz6"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -193,24 +193,24 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
-            Assert.That(updateUserResponse.Content, Does.Contain("Conflict"),
-                 $"Response content does not indicate Conflict. Content: {updateUserResponse.Content}");
+            Assert.That(await updateUserResponse.Content.ReadAsStringAsync(), Does.Contain("Conflict"),
+                 $"Response content does not indicate Conflict. Content: {await updateUserResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
         [AllureIssue("BUG_UpdateUser_2")]
         [AllureStep("Update user via PUT with missing required fields and verify user is not updated")]
-        public void UpdateUserNotAllReqFieldsPut_UserNotUpdated_Test()
+        public async Task UpdateUserNotAllReqFieldsPut_UserNotUpdated_Test()
         {
             var usersInitialCreation = new List<User>
             {
                 new User { Age = 1, Name = "u7", Sex = "FEMALE", ZipCode = "oz7"}
             };
 
-            ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
+            await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
@@ -218,13 +218,13 @@ namespace RestApiCSharp.Tests
                 UserToChange = usersInitialCreation[0]
             };
 
-            var updateUserResponse = ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
-            var getUsersResponse = ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
+            var updateUserResponse = await ApiClientInstance.UpdateUsersPut(ConstantsTesting.WriteScope, userUpdate);
+            var getUsersResponse = await ApiClientInstance.GetUsers(ConstantsTesting.ReadScope);
 
-            Assert.That(getUsersResponse.Content, Does.Not.Contain("New4"),
-                $"The user 'New4' was added. Response content: {getUsersResponse.Content}");
-            Assert.That(getUsersResponse.Content, Does.Contain("u7"),
-                $"The user 'u7' was removed. Response content: {getUsersResponse.Content}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Not.Contain("New4"),
+                $"The user 'New4' was added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Contain("u7"),
+                $"The user 'u7' was removed. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
     }
 }
