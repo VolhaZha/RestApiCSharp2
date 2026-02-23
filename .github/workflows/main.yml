@@ -31,30 +31,6 @@ jobs:
       - name: Build the project
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
-        # ✅ Run tests and generate Allure results
-      - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release --logger "trx" --results-directory ./allure-results
-        continue-on-error: true
-
-      # ✅ Install Allure
-      - name: Install Allure
-        run: |
-          sudo apt-add-repository ppa:qameta/allure
-          sudo apt-get update
-          sudo apt-get install allure -y
-
-      # ✅ Generate Allure report
-      - name: Generate Allure Report
-        run: |
-          allure generate ./allure-results --clean -o ./allure-report
-
-      # ✅ Upload report as artifact
-      - name: Upload Allure Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: allure-report
-          path: ./allure-report
-
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  
