@@ -24,14 +24,14 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u", Sex = "FEMALE", ZipCode = "oz"}
+                new User { Age = 1, Name = "u", Sex = Sex.FEMALE, ZipCode = "oz"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
-                UserNewValues = new User { Age = 20, Name = "New", Sex = "MALE", ZipCode = "oz02" },
+                UserNewValues = new User { Age = 20, Name = "New", Sex = Sex.MALE, ZipCode = "oz02" },
                 UserToChange = usersInitialCreation[0]
             };
 
@@ -42,7 +42,7 @@ namespace RestApiCSharp.Tests
                             $"Status code 200 not returned." +
                             $"Expected status code 200 (OK), but got {updateUserResponse.StatusCode}. " +
                             $"Response content: {await updateUserResponse.Content.ReadAsStringAsync()}");
-            Assert.That(getUsersResponse.Content, Does.Contain("New"),
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Contain("New"),
                             $"The user 'New' was not added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
@@ -52,14 +52,14 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u1", Sex = "FEMALE", ZipCode = "oz1"}
+                new User { Age = 1, Name = "u1", Sex = Sex.FEMALE, ZipCode = "oz1"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
-                UserNewValues = new User { Age = 20, Name = "New1", Sex = "MALE", ZipCode = "oz12" },
+                UserNewValues = new User { Age = 20, Name = "New1", Sex = Sex.MALE, ZipCode = "oz12" },
                 UserToChange = usersInitialCreation[0]
             };
 
@@ -80,14 +80,14 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u2", Sex = "FEMALE", ZipCode = "oz2"}
+                new User { Age = 1, Name = "u2", Sex = Sex.FEMALE, ZipCode = "oz2"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
-                UserNewValues = new User { Age = 20, Name = "New2", Sex = "MALE", ZipCode = "oz222" },
+                UserNewValues = new User { Age = 20, Name = "New2", Sex = Sex.MALE, ZipCode = "oz222" },
                 UserToChange = usersInitialCreation[0]
             };
 
@@ -106,14 +106,14 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u3", Sex = "FEMALE", ZipCode = "oz3"}
+                new User { Age = 1, Name = "u3", Sex = Sex.FEMALE, ZipCode = "oz3"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
 
             var userUpdate = new UserUpdate
             {
-                UserNewValues = new User { Age = 20, Name = "New3", Sex = "MALE", ZipCode = "oz332" },
+                UserNewValues = new User { Age = 20, Name = "New3", Sex = Sex.MALE, ZipCode = "oz332" },
                 UserToChange = usersInitialCreation[0]
             };
 
@@ -132,7 +132,7 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u4", Sex = "FEMALE", ZipCode = "oz4"}
+                new User { Age = 1, Name = "u4", Sex = Sex.FEMALE, ZipCode = "oz4"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
@@ -156,7 +156,7 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u5", Sex = "FEMALE", ZipCode = "oz5"}
+                new User { Age = 1, Name = "u5", Sex = Sex.FEMALE, ZipCode = "oz5"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
@@ -172,8 +172,8 @@ namespace RestApiCSharp.Tests
 
             Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Not.Contain("New4"),
                 $"The user 'New4' was added. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
-            Assert.That(    getUsersResponse.Content, Does.Contain("u5"),
-                $"The user 'u5' was removed. Response content: {    getUsersResponse.Content}");
+            Assert.That(await getUsersResponse.Content.ReadAsStringAsync(), Does.Contain("u5"),
+                $"The user 'u5' was removed. Response content: {await getUsersResponse.Content.ReadAsStringAsync()}");
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u6", Sex = "FEMALE", ZipCode = "oz6"}
+                new User { Age = 1, Name = "u6", Sex = Sex.FEMALE, ZipCode = "oz6"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);
@@ -207,7 +207,7 @@ namespace RestApiCSharp.Tests
         {
             var usersInitialCreation = new List<User>
             {
-                new User { Age = 1, Name = "u7", Sex = "FEMALE", ZipCode = "oz7"}
+                new User { Age = 1, Name = "u7", Sex = Sex.FEMALE, ZipCode = "oz7"}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, usersInitialCreation);

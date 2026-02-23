@@ -18,8 +18,8 @@ namespace RestApiCSharp.Tests
 
             var users = new List<User>
             {
-                new User { Age = 0, Name = "u1", Sex = "FEMALE", ZipCode = "oz1" },
-                new User { Name = "u3", Sex = "FEMALE" }
+                new User { Age = 0, Name = "u1", Sex = Sex.FEMALE, ZipCode = "oz1" },
+                new User { Name = "u3", Sex = Sex.FEMALE}
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, users);
@@ -33,7 +33,7 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "u",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "oz"
             };
 
@@ -73,7 +73,7 @@ namespace RestApiCSharp.Tests
             var user = new User
             {
                 Name = "u2",
-                Sex = "FEMALE"
+                Sex = Sex.FEMALE
             };
 
             var response = await ApiClientInstance.CreateUsers(ConstantsTesting.WriteScope, user);
@@ -102,7 +102,7 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "u4",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "brfrtr"
             };
 
@@ -132,7 +132,7 @@ namespace RestApiCSharp.Tests
             var user = new User
             {
                 Name = "u1",
-                Sex = "FEMALE"
+                Sex = Sex.FEMALE
             };
 
             HttpResponseMessage response = null;
@@ -158,7 +158,7 @@ namespace RestApiCSharp.Tests
             var user = new User
             {
                 Name = "u1",
-                Sex = "FEMALE"
+                Sex = Sex.FEMALE    
             }; 
             
             var response = await ApiClientInstance.CreateUsers(ConstantsTesting.WriteScope, user);

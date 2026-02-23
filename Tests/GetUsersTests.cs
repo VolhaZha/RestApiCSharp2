@@ -14,10 +14,10 @@ namespace RestApiCSharp.Tests
         {
             var users = new List<User>
             {
-                new User { Age = 5, Name = "uGetUsersTests1", Sex = "FEMALE" },
-                new User { Age = 15, Name = "uGetUsersTests2", Sex = "FEMALE" },
-                new User { Age = 30, Name = "uGetUsersTests3", Sex = "MALE" },
-                new User { Age = 50, Name = "uGetUsersTests4", Sex = "MALE" }
+                new User { Age = 5, Name = "uGetUsersTests1", Sex = Sex.FEMALE },
+                new User { Age = 15, Name = "uGetUsersTests2", Sex = Sex.FEMALE },
+                new User { Age = 30, Name = "uGetUsersTests3", Sex = Sex.MALE },
+                new User { Age = 50, Name = "uGetUsersTests4", Sex = Sex.MALE }
             };
 
             await ApiClientInstance.CreateUsersList(ConstantsTesting.WriteScope, users);
@@ -46,7 +46,7 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "trololo",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "oz"
             };
 

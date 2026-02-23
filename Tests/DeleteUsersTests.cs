@@ -26,7 +26,7 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "u",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "oz"
             };
 
@@ -55,14 +55,14 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "u1",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "oz1"
             };
 
             var userRequiredFields = new User
             {
                 Name = "u1",
-                Sex = "FEMALE"
+                Sex = Sex.FEMALE
             };
 
             await ApiClientInstance.CreateUsers(ConstantsTesting.WriteScope, user);
@@ -89,7 +89,7 @@ namespace RestApiCSharp.Tests
             var user = new User
             {
                 Name = "u2",
-                Sex = "FEMALE"
+                Sex = Sex.FEMALE
             };
 
             await ApiClientInstance.CreateUsers(ConstantsTesting.WriteScope, user);
@@ -113,7 +113,7 @@ namespace RestApiCSharp.Tests
             {
                 Age = 0,
                 Name = "u3",
-                Sex = "FEMALE",
+                Sex = Sex.FEMALE,
                 ZipCode = "oz3"
             };
 
@@ -132,10 +132,10 @@ namespace RestApiCSharp.Tests
             var deleteUsersResponseContent = await deleteUsersResponse.Content.ReadAsStringAsync();
             var getUsersResponseContent = await getUsersResponse.Content.ReadAsStringAsync();
 
-            Assert.That(deleteUsersResponseContent, Does.Contain("Conflict"),
-                 $"Response content does not indicate FailedDependency. Content: {deleteUsersResponseContent}");
+            Assert.That(deleteUsersResponse.StatusCode, Is.EqualTo(HttpStatusCode.Conflict),
+                 $"Expected status code 409 (Conflict), but got {deleteUsersResponse.StatusCode}. Response content: {deleteUsersResponseContent}");
             Assert.That(getUsersResponseContent, Does.Contain("u3"),
-                            $"The user 'u1' was not deleted. Response content: {getUsersResponseContent}");
+                 $"The user 'u1' was not deleted. Response content: {getUsersResponseContent}");
         }
     }
 }

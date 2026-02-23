@@ -1,7 +1,19 @@
-﻿public class User
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using RestApiCSharp.ConstantsTestingGeneral;
+
+public class User
 {
-    public int Age { get; set; }
+    [JsonProperty("age")]
+    public int? Age { get; set; }
+
+    [JsonProperty("name")] 
     public string Name { get; set; }
-    public string Sex { get; set; }
+
+    [JsonProperty("sex")]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public Sex Sex { get; set; }
+
+    [JsonProperty("zipCode")] 
     public string ZipCode { get; set; }
 }
