@@ -38,6 +38,10 @@ jobs:
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  
 
+# Install Java (required by Allure CLI)
+      - name: Install OpenJDK 11
+        run: sudo apt-get install -y openjdk-11-jdk
+
       # Install Allure Commandline
       - name: Install Allure Commandline
         run: |
