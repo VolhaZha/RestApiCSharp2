@@ -43,25 +43,21 @@ jobs:
 
       - name: Install Allure CLI
         run: |
-          ALLURE_VERSION=2.27.0
-          wget https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz
-          tar -zxvf allure-${ALLURE_VERSION}.tgz
-          sudo mv allure-${ALLURE_VERSION} /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-          allure --version
+          sudo apt-get update
+          sudo apt-get install -y allure
 
       - name: Generate Allure report
         if: always()
         run: |
           mkdir -p allure-results
-          allure RestApiCSharp2/bin/Debug/net9.0/allure-results -o allure-report --clean
+          allure generate allure-results -o allure-report --clean
 
       - name: Upload Allure results (raw)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
-          path: RestApiCSharp2/bin/Debug/net9.0/allure-results
+          path: allure-results
           if-no-files-found: warn
           retention-days: 14
 
