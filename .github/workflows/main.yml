@@ -34,3 +34,38 @@ jobs:
       - name: Run tests
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  
+
+      - name: Set up Java for Allure CLI
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Allure CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y allure
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          mkdir -p allure-results
+          allure generate bin/Debug/net9.0/allure-results/allure-results -o allure-report --clean
+
+      - name: Upload Allure results (raw)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: bin/Debug/net9.0/allure-results/allure-results
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Allure report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: bin/Debug/net9.0/allure-results/allure-results/allure-report
+          if-no-files-found: warn
+          retention-days: 14
