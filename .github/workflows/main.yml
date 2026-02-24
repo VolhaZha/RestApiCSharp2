@@ -50,14 +50,14 @@ jobs:
         if: always()
         run: |
           mkdir -p allure-results
-          allure generate bin/Debug/net9.0/allure-results/allure-results -o allure-report --clean
+          allure allure-results -o allure-report --clean
 
       - name: Upload Allure results (raw)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
-          path: bin/Debug/net9.0/allure-results/allure-results
+          path: allure-results
           if-no-files-found: warn
           retention-days: 14
 
