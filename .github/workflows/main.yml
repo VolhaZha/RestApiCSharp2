@@ -35,14 +35,26 @@ jobs:
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release 
+        run: dotnet test RestApiCSharp2.sln --configuration Release --logger "trx" 
         continue-on-error: true  
 
-      - name: Run tests and generate report
-        run: npx allure run -- npm run test
+      - name: Install Allure Commandline
+        run: |
+          curl -o allure-2.14.0.tgz -L https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz
+          tar -zxvf allure-2.14.0.tgz
+          sudo mv allure-2.14.0/bin/allure /usr/local/bin
+
+      - name: Generate Allure report
+        run: allure generate --clean -o allure-report
+
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v0
+        with:
+          name: allure-report
+          path: allure-report
 
       - name: Run Allure Action
         uses: allure-framework/allure-report@v0
         with:
-          report-directory: "./allure-report"
+          report-directory: "allure-report"
           github-token: ${{ secrets.GITHUB_TOKEN }}
