@@ -38,11 +38,20 @@ jobs:
         run: dotnet test RestApiCSharp2.sln --configuration Release 
         continue-on-error: true  
 
-      - name: Run tests and generate report
-        run: npx allure run -- npm run test
+      # Install Allure Commandline
+      - name: Install Allure Commandline
+        run: |
+          curl -o allure-2.14.0.tgz -L https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz
+          tar -zxvf allure-2.14.0.tgz
+          sudo mv allure-2.14.0/bin/allure /usr/local/bin
 
-      - name: Run Allure Action
-        uses: allure-framework/allure-report@v0
+      # Generate Allure report from test results
+      - name: Generate Allure report
+        run: allure generate --clean -o allure-report
+
+      # Upload the Allure report as an artifact
+      - name: Upload Allure report as artifact
+        uses: actions/upload-artifact@v2
         with:
-          report-directory: "./allure-report"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: allure-report
+          path: allure-report
