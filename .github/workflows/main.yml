@@ -43,8 +43,12 @@ jobs:
 
       - name: Install Allure CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y allure
+          ALLURE_VERSION=2.27.0
+          wget https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz
+          tar -zxvf allure-${ALLURE_VERSION}.tgz
+          sudo mv allure-${ALLURE_VERSION} /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+          allure --version
 
       - name: Generate Allure report
         if: always()
