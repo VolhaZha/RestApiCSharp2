@@ -32,8 +32,10 @@ jobs:
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release 
-        continue-on-error: true  
+        run: dotnet test RestApiCSharp2.sln --configuration Release
+        continue-on-error: true
+        env:
+          ALLURE_RESULTS_DIRECTORY: allure-results
 
       - name: Set up Java for Allure CLI
         uses: actions/setup-java@v4
@@ -50,43 +52,36 @@ jobs:
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
           allure --version
 
+      - name: Find allure-results directory
+        if: always()
+        id: find_allure
+        shell: bash
+        run: |
+          echo "🔍 Searching for allure-results folder..."
+          FOUND_PATH=$(find . -type d -name "allure-results" | head -n 1)
+          if [ -n "$FOUND_PATH" ]; then
+            echo "✅ Found allure-results at: $FOUND_PATH"
+            ls -la "$FOUND_PATH"
+            echo "path=$FOUND_PATH" >> $GITHUB_OUTPUT
+          else
+            echo "❌ allure-results folder not found."
+            exit 1
+          fi
+
       - name: Generate Allure report
         if: always()
+        shell: bash
         run: |
-          mkdir -p allure-results
-          allure generate allure-results -o allure-report --clean
-
-      - name: Verify allure-results directory
-        if: always()
-        continue-on-error: true
-        run: |
-         if [ -d "RestApiCSharp2/bin/Debug/net9.0/allure-results" ]; then
-         echo "✅ allure-results directory exists."
-         ls -la RestApiCSharp2/bin/Debug/net9.0/allure-results
-         else
-         echo "❌ allure-results directory does NOT exist."
-         exit 1
-
-      - name: Search for allure-results folder
-        if: always()
-        continue-on-error: true
-        run: |
-         echo "🔍 Searching for allure-results folder..."
-         FOUND_PATH=$(find . -type d -name "allure-results" | head -n 1)
-         if [ -n "$FOUND_PATH" ]; then
-         echo "✅ Found allure-results at: $FOUND_PATH"
-         ls -la "$FOUND_PATH"
-         else
-         echo "❌ allure-results folder not found."
-         exit 1
-         fi
+          allure generate "${{ steps.find_allure.outputs.path }}" -o allure-report --clean
+          echo "📄 Allure report generated:"
+          ls -la allure-report
 
       - name: Upload Allure results (raw)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
-          path: allure-results
+          path: ${{ steps.find_allure.outputs.path }}
           if-no-files-found: warn
           retention-days: 14
 
@@ -95,6 +90,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: allure-results/allure-report
+          path: allure-report
           if-no-files-found: warn
           retention-days: 14
