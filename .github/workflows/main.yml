@@ -56,6 +56,31 @@ jobs:
           mkdir -p allure-results
           allure generate allure-results -o allure-report --clean
 
+      - name: Verify allure-results directory
+        if: always()
+        continue-on-error: true
+        run: |
+         if [ -d "RestApiCSharp2/bin/Debug/net9.0/allure-results" ]; then
+         echo "✅ allure-results directory exists."
+         ls -la RestApiCSharp2/bin/Debug/net9.0/allure-results
+         else
+         echo "❌ allure-results directory does NOT exist."
+         exit 1
+
+      - name: Search for allure-results folder
+        if: always()
+        continue-on-error: true
+        run: |
+         echo "🔍 Searching for allure-results folder..."
+         FOUND_PATH=$(find . -type d -name "allure-results" | head -n 1)
+         if [ -n "$FOUND_PATH" ]; then
+         echo "✅ Found allure-results at: $FOUND_PATH"
+         ls -la "$FOUND_PATH"
+         else
+         echo "❌ allure-results folder not found."
+         exit 1
+         fi
+
       - name: Upload Allure results (raw)
         if: always()
         uses: actions/upload-artifact@v4
