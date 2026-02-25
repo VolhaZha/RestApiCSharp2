@@ -1,8 +1,5 @@
 name: Main Workflow
 on: workflow_dispatch
-permissions:
-  pull-requests: write
-  checks: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,27 +32,64 @@ jobs:
         run: dotnet build RestApiCSharp2.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test RestApiCSharp2.sln --configuration Release 
-        continue-on-error: true  
+        run: dotnet test RestApiCSharp2.sln --configuration Release
+        continue-on-error: true
+        env:
+          ALLURE_RESULTS_DIRECTORY: allure-results
 
-# Install Java (required by Allure CLI)
-      - name: Install OpenJDK 11
-        run: sudo apt-get install -y openjdk-11-jdk
+      - name: Set up Java for Allure CLI
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      # Install Allure Commandline
-      - name: Install Allure Commandline
+      - name: Install Allure CLI
         run: |
-          curl -o allure-2.14.0.tgz -L https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz
-          tar -zxvf allure-2.14.0.tgz
-          sudo mv allure-2.14.0/bin/allure /usr/local/bin
+          ALLURE_VERSION=2.27.0
+          wget https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz
+          tar -zxvf allure-${ALLURE_VERSION}.tgz
+          sudo mv allure-${ALLURE_VERSION} /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+          allure --version
 
-      # Generate Allure report from test results
+      - name: Find allure-results directory
+        if: always()
+        id: find_allure
+        shell: bash
+        run: |
+          echo "🔍 Searching for allure-results folder..."
+          FOUND_PATH=$(find . -type d -name "allure-results" | head -n 1)
+          if [ -n "$FOUND_PATH" ]; then
+            echo "✅ Found allure-results at: $FOUND_PATH"
+            ls -la "$FOUND_PATH"
+            echo "path=$FOUND_PATH" >> $GITHUB_OUTPUT
+          else
+            echo "❌ allure-results folder not found."
+            exit 1
+          fi
+
       - name: Generate Allure report
-        run: allure generate --clean -o allure-report
+        if: always()
+        shell: bash
+        run: |
+          allure generate "${{ steps.find_allure.outputs.path }}" -o allure-report --clean
+          echo "📄 Allure report generated:"
+          ls -la allure-report
 
-      # Upload the Allure report as an artifact
-      - name: Upload Allure report as artifact
+      - name: Upload Allure results (raw)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: ${{ steps.find_allure.outputs.path }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Allure report (HTML)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
+          if-no-files-found: warn
+          retention-days: 14
