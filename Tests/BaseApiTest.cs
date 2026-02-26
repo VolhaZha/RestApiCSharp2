@@ -1,28 +1,36 @@
 ﻿using NLog;
 using RestApiCSharp.Clients;
 using RestApiCSharp.ConstantsTestingGeneral;
-using RestSharp;
 
 namespace RestApiCSharp.Tests
 {
     public abstract class BaseApiTest
     {
-        protected RestClient Client { get; private set; }
-        protected ApiClient ApiClientInstance { get; private set; }
+        protected ApiClientHttp ApiClientInstance { get; private set; }
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         protected BaseApiTest()
-        {
-            Logger.Info("Initializing BaseApiTest");
 
-            ApiClient.Initialize(
+        {
+        Logger.Info("Initializing BaseApiTest");
+
+        try
+        {
+            ApiClientHttp.Initialize(
                 baseUrl: ConstantsTesting.BaseUrl,
                 clientId: ConstantsTesting.ClientId,
                 clientSecret: ConstantsTesting.ClientSecret
             );
 
-            ApiClientInstance = ApiClient.GetInstance();
+            ApiClientInstance = ApiClientHttp.GetInstance();  
+            
+            Logger.Info("ApiClient initialized successfully.");
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Error initializing ApiClientHttp.");
+            throw;  
+        }
 
-            Logger.Info("ApiClient initialized successfully");
         }
     }
 }

@@ -1,25 +1,18 @@
-﻿using RestSharp;
-using RestSharp.Authenticators;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace RestApiCSharp.Authentication
 {
-    public class Authenticator : AuthenticatorBase
+    public class Authenticator
     {
-        record TokenResponse
-        {
-            [JsonPropertyName("token_type")]
-            public string TokenType { get; init; }
-            [JsonPropertyName("access_token")]
-            public string AccessToken { get; init; }
-        }
-
         readonly string _baseUrl;
         readonly string _clientId;
         readonly string _clientSecret;
         readonly string _scope;
+        private string _token = string.Empty;
 
-        public Authenticator(string baseUrl, string clientId, string clientSecret, string scope) : base("")
+        public Authenticator(string baseUrl, string clientId, string clientSecret, string scope)
         {
             _baseUrl = baseUrl;
             _clientId = clientId;
@@ -27,27 +20,46 @@ namespace RestApiCSharp.Authentication
             _scope = scope;
         }
 
-        protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken)
+        public async Task<string> GetAuthenticationHeaderAsync()
         {
-            Token = string.IsNullOrEmpty(Token) ? await GetToken() : Token;
-            return new HeaderParameter(KnownHeaders.Authorization, Token);
+            _token = string.IsNullOrEmpty(_token) ? await GetTokenAsync() : _token;
+            return _token;
         }
 
-        async Task<string> GetToken()
+        private async Task<string> GetTokenAsync()
         {
-            var options = new RestClientOptions(_baseUrl)
-            {
-                Authenticator = new HttpBasicAuthenticator(_clientId, _clientSecret),
-            };
+            using var client = new HttpClient { BaseAddress = new System.Uri(_baseUrl) };
 
-            using var client = new RestClient(options);
+            var byteArray = Encoding.ASCII.GetBytes($"{_clientId}:{_clientSecret}");
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-            var request = new RestRequest("oauth/token")
-                .AddParameter("grant_type", "client_credentials")
-                .AddParameter("scope", _scope);
-            var response = await client.PostAsync<TokenResponse>(request);
+            var content = new FormUrlEncodedContent
+                (
+            [
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("scope", _scope)
+            ]);
 
-            return $"{response!.TokenType} {response!.AccessToken}";
+            var response = await client.PostAsync("oauth/token", content);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseContent);
+
+            if (tokenResponse == null)
+                throw new System.InvalidOperationException("Failed to retrieve token");
+
+            return $"{tokenResponse.TokenType} {tokenResponse.AccessToken}";
+        }
+
+        private class TokenResponse
+        {
+            [JsonProperty("token_type")]
+            public string TokenType { get; set; }
+
+            [JsonProperty("access_token")]
+            public string AccessToken { get; set; }
         }
     }
 }
